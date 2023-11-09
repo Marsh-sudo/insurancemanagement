@@ -1,0 +1,4 @@
+-r base.txt # includes the base.txt requirements file
+
+flake8==5.0.4
+flake8-isort==6.0.0
