@@ -1,21 +1,9 @@
-from datetime import date, timedelta
-
-from django.conf import settings
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required, user_passes_test
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.models import Group, User
-from django.core.mail import send_mail
-from django.db.models import Q, Sum
-from django.http import HttpResponseRedirect
-from django.shortcuts import get_object_or_404, redirect, render, reverse
-from django.views.generic import CreateView, ListView, TemplateView
-
 from customer import forms as CFORM
 from customer import models as CMODEL
-
-from .. import forms, models
-from ..models import Category, Customer, Question
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from django.http import HttpResponseRedirect
+from django.shortcuts import redirect, render
 
 
 def is_customer(user):

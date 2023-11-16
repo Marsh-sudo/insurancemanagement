@@ -1,13 +1,13 @@
+from customer import models as CMODEL
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect, render
-
-from customer import models as CMODEL
 
 from .. import forms, models
 
 
 def home_view(request):
+    """Home view"""
     if request.user.is_authenticated:
         return HttpResponseRedirect("afterlogin")
     return render(request, "insurance/index.html")

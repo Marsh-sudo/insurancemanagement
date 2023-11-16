@@ -1,10 +1,9 @@
+from customer import forms as CFORM
+from customer import models as CMODEL
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect, render
-
-from customer import forms as CFORM
-from customer import models as CMODEL
 
 
 @login_required(login_url="adminlogin")

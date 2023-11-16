@@ -9,6 +9,7 @@ def admin_policy_view(request):
 
 
 def admin_add_policy_view(request):
+    """View function to add new policy"""
     policyForm = forms.PolicyForm()
 
     if request.method == "POST":
@@ -38,6 +39,7 @@ def admin_update_policy_view(request):
 
 @login_required(login_url="adminlogin")
 def update_policy_view(request, pk):
+    """update policy view"""
     policy = models.Policy.objects.get(id=pk)
     policyForm = forms.PolicyForm(instance=policy)
 
@@ -57,11 +59,13 @@ def update_policy_view(request, pk):
 
 
 def admin_delete_policy_view(request):
+    """admin delete policy view"""
     policies = models.Policy.objects.all()
     return render(request, "insurance/admin_delete_policy.html", {"policies": policies})
 
 
 def delete_policy_view(request, pk):
+    """delete policy view"""
     policy = models.Policy.objects.get(id=pk)
     policy.delete()
     return redirect("admin-delete-policy")
@@ -104,7 +108,7 @@ def admin_view_waiting_policy_holder_view(request):
 
 
 def approve_request_view(request, pk):
-    
+    """Approve policy record"""
     policyrecords = models.PolicyRecord.objects.get(id=pk)
     policyrecords.status = "Approved"
     policyrecords.save()
@@ -112,6 +116,7 @@ def approve_request_view(request, pk):
 
 
 def disapprove_request_view(request, pk):
+    """Disapprove policy record"""
     policyrecords = models.PolicyRecord.objects.get(id=pk)
     policyrecords.status = "Disapproved"
     policyrecords.save()
