@@ -1,9 +1,7 @@
 from django.shortcuts import redirect, render
-
-from insurance import forms as CFORM
 from insurance import models as CMODEL
 
-from .. import forms, models
+from .. import models
 
 
 def apply_policy_view(request):

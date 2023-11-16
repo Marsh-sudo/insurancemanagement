@@ -1,8 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
 from django.http import HttpResponseRedirect
-from django.shortcuts import redirect, render
-
+from django.shortcuts import render
 from insurance import models as CMODEL
 
 from .. import forms, models
@@ -40,6 +39,7 @@ def is_customer(user):
 
 @login_required(login_url="customerlogin")
 def customer_dashboard_view(request):
+    """Customer dashboard"""
     dict = {
         "customer": models.Customer.objects.get(user_id=request.user.id),
         "available_policy": CMODEL.Policy.objects.all().count(),

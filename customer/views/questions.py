@@ -1,5 +1,4 @@
 from django.shortcuts import redirect, render
-
 from insurance import forms as CFORM
 from insurance import models as CMODEL
 
@@ -7,6 +6,7 @@ from .. import forms, models
 
 
 def ask_question_view(request):
+    """Ask question view"""
     customer = models.Customer.objects.get(user_id=request.user.id)
     questionForm = CFORM.QuestionForm()
 
@@ -25,6 +25,7 @@ def ask_question_view(request):
 
 
 def question_history_view(request):
+    """Get question view"""
     customer = models.Customer.objects.get(user_id=request.user.id)
     questions = CMODEL.Question.objects.all().filter(customer=customer)
     return render(
