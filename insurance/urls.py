@@ -1,8 +1,9 @@
+from django.contrib.auth.views import LoginView, LogoutView
 from django.urls import path
-from insurance.views import views
-from django.contrib.auth.views import LogoutView, LoginView
-from .views import category, constants, customers, policy, questions
 
+from insurance.views import views
+
+from .views import category, constants, customers, policy, questions
 
 urlpatterns = [
     path("", views.home_view, name=""),
