@@ -1,10 +1,10 @@
+from customer.models import Customer
 from django.contrib.auth.models import User
 from django.db import models
 
-from customer.models import Customer
-
 
 class Category(models.Model):
+    """Category Model"""
     category_name = models.CharField(max_length=20)
     creation_date = models.DateField(auto_now=True)
 
@@ -13,6 +13,7 @@ class Category(models.Model):
 
 
 class Policy(models.Model):
+    """Policy Model"""
     category = models.ForeignKey("Category", on_delete=models.CASCADE)
     policy_name = models.CharField(max_length=200)
     sum_assurance = models.PositiveIntegerField()
@@ -25,6 +26,7 @@ class Policy(models.Model):
 
 
 class PolicyRecord(models.Model):
+    """Policy Record Model"""
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     Policy = models.ForeignKey(Policy, on_delete=models.CASCADE)
     status = models.CharField(max_length=100, default="Pending")
@@ -35,6 +37,7 @@ class PolicyRecord(models.Model):
 
 
 class Question(models.Model):
+    """Question Model"""
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     description = models.CharField(max_length=500)
     admin_comment = models.CharField(max_length=200, default="Nothing")
