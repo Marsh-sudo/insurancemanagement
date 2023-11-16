@@ -4,7 +4,6 @@ from insurance import models as CMODEL
 
 from .. import forms, models
 
-
 def ask_question_view(request):
     """Ask question view"""
     customer = models.Customer.objects.get(user_id=request.user.id)
