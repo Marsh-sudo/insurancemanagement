@@ -1,10 +1,12 @@
 import pytest
 from django.urls import reverse
-from django.test import Client
+from django.test import TestCase
 from django.contrib.auth.models import User
 from mixer.backend.django import mixer
 from .. import models
 from insurance import models
+from django.urls import reverse
+from django.contrib.auth.models import User
 
 
 @pytest.fixture
@@ -60,3 +62,57 @@ def test_admin_add_policy_view(client, admin_user, sample_category_data, sample_
 
     # Assert that the policy was created
     assert models.Policy.objects.filter(policy_name='Test Policy').exists()
+
+
+class UpdatePolicyViewTest(TestCase):
+    def setUp(self):
+        # Create a user for testing (you may adjust this as needed)
+        self.user = User.objects.create_user(
+            username='testuser',
+            password='testpassword'
+        )
+
+        # Create a category for the policy
+        self.category = models.Category.objects.create(category_name='TestCategory')
+
+        # Create a policy for testing
+        self.policy = models.Policy.objects.create(
+            policy_name='TestPolicy',
+            sum_assurance=500,
+            premium=500,
+            tenure=10,
+            category=self.category
+        )
+
+    def test_update_policy_view(self):
+        # Log in the user
+        self.client.login(username='testuser', password='testpassword')
+
+        # Prepare the updated data
+        updated_data = {
+            'policy_name': 'UpdatedPolicy',
+            'sum_assurance': 600,
+            'category': self.category.id,
+            'premium':700,
+            'tenure':80,
+
+            # Add other fields as needed
+        }
+
+        # Get the update URL for the specific policy
+        update_url = reverse('update-policy', args=[self.policy.id])
+
+        # Simulate a POST request to update the policy
+        response = self.client.post(update_url, data=updated_data)
+
+        # Check if the update was successful (you may adjust this based on your redirect logic)
+        self.assertRedirects(response, reverse('admin-update-policy'))
+
+        # Retrieve the policy again to check if it was updated in the database
+        updated_policy = models.Policy.objects.get(id=self.policy.id)
+
+        self.assertEqual(updated_policy.policy_name, 'UpdatedPolicy')
+        self.assertEqual(updated_policy.tenure, 80)
+        self.assertEqual(updated_policy.category, self.category)
+
+
