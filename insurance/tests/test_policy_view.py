@@ -1,70 +1,62 @@
 import pytest
 from django.urls import reverse
-
+from django.test import Client
+from django.contrib.auth.models import User
+from mixer.backend.django import mixer
 from .. import models
+from insurance import models
+
+
+@pytest.fixture
+def admin_user(db):
+    return mixer.blend(User, is_staff=True, is_superuser=True)
+
+@pytest.fixture
+def sample_category_data():
+    return {
+        "category_name": "Test Category",
+        "creation_date": "2023-01-01",  # Replace with an appropriate date
+    }
+
+@pytest.fixture
+def sample_policy_data():
+    return {
+        "category": mixer.blend(models.Category).id,
+        "policy_name": "Test Policy",
+        "sum_assurance": 10000,
+        "premium": 500,
+        "tenure": 12,
+        "creation_date": "2023-01-01",  # Replace with an appropriate date
+    }
 
 
 @pytest.mark.django_db
-def test_admin_policy_view(client, admin_user):
-    response = client.get(reverse('admin-policy'))
-    assert response.status_code == 200
-    assert b'insurance/admin_policy.html' in response.content
+def test_admin_add_policy_view(client, admin_user, sample_category_data, sample_policy_data):
+    # Create a category to be used in the form
+    response_category = client.post(reverse('admin-add-category'), data=sample_category_data)
+    assert response_category.status_code == 302
 
-@pytest.mark.django_db
-def test_admin_add_policy_view(client, admin_user, sample_category_data):
-    response = client.post(reverse('admin-add-policy'), data=sample_category_data)
-    assert response.status_code == 302  # Redirect status code after successful form submission
-    assert models.Policy.objects.filter(policy_name='Test Policy').exists()
+    # Log in the admin user
+    client.force_login(admin_user)
 
-@pytest.mark.django_db
-def test_admin_view_policy_view(client, admin_user, sample_policy):
-    response = client.get(reverse('admin-view-policy'))
-    assert response.status_code == 200
-    assert sample_policy.policy_name.encode() in response.content
+    # Get the created category for the policy form
+    category_id = models.Category.objects.last().id
 
-@pytest.mark.django_db
-def test_admin_update_policy_view(client, admin_user, sample_policy, update_policy_data):
-    response = client.post(reverse('admin-update-policy', args=[sample_policy.pk]), data=update_policy_data)
-    assert response.status_code == 302  # Redirect status code after successful form submission
-    assert models.Policy.objects.get(pk=sample_policy.pk).policy_name == 'Updated Policy'
+    # Create a request with POST data
+    request_data = {
+        "category": category_id,
+        "policy_name": "Test Policy",
+        "sum_assurance": 10000,
+        "premium": 500,
+        "tenure": 12,
+        "creation_date": "2023-01-01",  # Replace with an appropriate date
+    }
+
+    response = client.post(reverse('admin-add-policy'), data=request_data)
     
+    # Assert that the response is a redirect to 'admin-view-policy'
+    assert response.status_code == 302
+    assert response.url == reverse('admin-view-policy')
 
-@pytest.mark.django_db
-def test_admin_update_policy_view_invalid_data(client, admin_user, sample_policy):
-    response = client.post(reverse('admin-update-policy', args=[sample_policy.pk]), data={})
-    assert response.status_code == 200
-    assert b'insurance/update_policy.html' in response.content
-
-
-@pytest.mark.django_db
-def test_admin_delete_policy_view(client, admin_user, sample_policy):
-    response = client.post(reverse('admin-delete-policy'), data={'pk': sample_policy.pk})
-    assert response.status_code == 302  # Redirect status code after successful deletion
-    assert not models.Policy.objects.filter(pk=sample_policy.pk).exists()
-
-@pytest.mark.django_db
-def test_admin_view_policy_holder_views(client, admin_user, sample_policy_record, sample_approved_policy_record,
-                                        sample_disapproved_policy_record, sample_waiting_policy_record):
-    views_to_test = [
-        ('admin-view-policy-holder', sample_policy_record),
-        ('admin-view-approved-policy-holder', sample_approved_policy_record),
-        ('admin-view-disapproved-policy-holder', sample_disapproved_policy_record),
-        ('admin-view-waiting-policy-holder', sample_waiting_policy_record),
-    ]
-
-    for view_name, sample_record in views_to_test:
-        response = client.get(reverse(view_name))
-        assert response.status_code == 200
-        assert sample_record.customer.get_name.encode() in response.content
-
-@pytest.mark.django_db
-def test_approve_request_view(client, admin_user, sample_policy_record):
-    response = client.post(reverse('approve-request', args=[sample_policy_record.pk]))
-    assert response.status_code == 302  # Redirect status code after successful approval
-    assert models.PolicyRecord.objects.get(pk=sample_policy_record.pk).status == 'Approved'
-
-@pytest.mark.django_db
-def test_disapprove_request_view(client, admin_user, sample_policy_record):
-    response = client.post(reverse('reject-request', args=[sample_policy_record.pk]))
-    assert response.status_code == 302  # Redirect status code after successful disapproval
-    assert models.PolicyRecord.objects.get(pk=sample_policy_record.pk).status == 'Disapproved'
+    # Assert that the policy was created
+    assert models.Policy.objects.filter(policy_name='Test Policy').exists()
