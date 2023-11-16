@@ -37,12 +37,6 @@ def admin_delete_category_view(request):
     )
 
 
-# def delete_category_view(request,pk):
-#     category = models.Category.objects.get(id=pk)
-#     category.delete()
-#     return redirect('admin-delete-category')
-
-
 def delete_category_view(request, pk):
     """Delete category view."""
     category = get_object_or_404(Category, pk=pk)
