@@ -23,11 +23,10 @@ def test_apply_view(client):
         policy = CMODEL.Policy.objects.create(description='Test Description')
         response = apply_view(client, pk=policy.id)
         assert response.status_code == 302
-    # Add more assertions as needed
+
 
 @pytest.mark.django_db
 def test_history_view(client):
     response = history_view(client)
     assert response.status_code == 200
     assertTemplateUsed(response, "customer/history.html")
-    # Add more assertions as needed
