@@ -1,6 +1,7 @@
 from django.contrib.auth.views import LoginView
 from django.urls import path
-from .views import views, policy, questions
+
+from .views import policy, questions, views
 
 urlpatterns = [
     path("customerclick", views.customerclick_view, name="customerclick"),
