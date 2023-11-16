@@ -5,7 +5,6 @@ omit =
     config/*
     manage.py
     */migrations/*
-    */tests/*
     */tests.py
 
 disable_warnings = no-data-collected
